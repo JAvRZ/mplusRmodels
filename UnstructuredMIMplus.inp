@@ -1,0 +1,39 @@
+TITLE: Unstructured Covariance Random intercepts with imputed data 
+DATA: FILE IS "exampledata_implist.dat";
+! input file is a list of complete (imputed) datafiles
+TYPE = IMPUTATION;
+VARIABLE:NAMES ARE ID study intercept sex age edu y1-y12; 
+USEVARIABLES ARE study sex age edu y1-y12; 
+! intercepts and ID scores have to be ignored, are not in the analysis
+CLUSTER = study;
+! study defines the second "between" level
+WITHIN = sex age edu;
+! sex age and education are IVs on level 1
+MISSING = .; 
+! missing values are coded as ., the Mplus default
+ANALYSIS:TYPE = TWOLEVEL;
+MODEL:  
+  %WITHIN%
+  y1-y12 ON sex age edu;
+  ! regression coefficients for all variables
+  y1-y12;
+  ! random within study (error) variance is estimated for all vars
+  y1 WITH y2 y3 y4 y5 y6 y7 y8 y9 y10 y11 y12;
+  ! within study covariance between var 1 and all other vars
+  y2 WITH y3 y4 y5 y6 y7 y8 y9 y10 y11 y12;
+  ! within study covariance between var 2 and others (except 1)
+  y3 WITH y4 y5 y6 y7 y8 y9 y10 y11 y12;
+  ! within study covariance between var 3 and others (exc. 1, 2)
+  y4 WITH y5 y6 y7 y8 y9 y10 y11 y12;
+  ! etc.
+  y5 WITH y6 y7 y8 y9 y10 y11 y12;
+  y6 WITH y7 y8 y9 y10 y11 y12;
+  y7 WITH y8 y9 y10 y11 y12;
+  y8 WITH y9 y10 y11 y12;
+  y9 WITH y10 y11 y12;
+  y10 WITH y11 y12;
+  y11 WITH y12;
+
+  %BETWEEN%
+  y1-y12;
+  ! random between study (intercept) variance is estimated for all vars
