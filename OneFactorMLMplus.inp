@@ -1,0 +1,26 @@
+TITLE: One factor Random intercepts ML 
+DATA: FILE IS "exampledata.dat";
+VARIABLE:NAMES ARE ID study intercept sex age edu y1-y12; 
+USEVARIABLES ARE study sex age edu y1-y12; 
+! intercepts and ID scores have to be ignored, are not in the analysis
+CLUSTER = study;
+! study defines the second "between" level
+WITHIN = sex age edu;
+! sex age and education are IVs on level 1
+MISSING = .; 
+! missing values are coded as ., the Mplus default
+ANALYSIS:TYPE = TWOLEVEL;
+MODEL:  
+  %WITHIN%
+  y1-y12 ON sex age edu;
+  ! regression coefficients for all variables
+  f1 BY y1* y2-y12;
+  ! define latent factor on which all variables load
+  ! asterisk frees the factor loading, is not restricted to 1
+  f1@1;
+  ! factor variance is restricted to 1
+  y1-y12;
+  ! random within study (error) variance is estimated for all vars
+  %BETWEEN%
+  y1-y12;
+  ! random between study (intercept) variance is estimated for all vars
